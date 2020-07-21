@@ -1,0 +1,98 @@
+﻿@model MiniDMartApp.Application.Models.ItemDataModel
+
+@{
+    ViewBag.Title = "GetData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<hr />
+
+<div style="width:90%; margin:0 auto;">
+
+    <table id="myTable">
+    </table>
+</div>
+<hr />
+@*@<div class="col-md-12">
+    @using (Html.BeginForm("GetAllData", "Shop", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()*@
+
+<div>
+    <div class="form-group">
+
+        @Html.LabelFor(model => model.Rate, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.Rate, (List<SelectListItem>)ViewBag.Rate, new { @id = "drpRate" })
+            @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+        <input type="button" id="idSearch" class="btn btn-default" value="Search" />
+    </div>
+</div>
+
+@*}
+    </div>*@
+<hr />
+
+<style>
+    tr.even {
+        background-color: #F5F5F5 !important;
+    }
+</style>
+
+@* Load datatable css *@
+<link href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css" rel="stylesheet" />
+@* Load datatable js *@
+@section Scripts{
+    <script src="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+          
+            debugger;
+            LoadGrid();
+
+        });
+        function LoadGrid(rate) {
+
+            alert("Call Load Grid");
+            $('#myTable').DataTable({
+
+                "ajax": {
+                    "url": "/Shop/GetAllData",
+                    "type": "Post",
+                    "datatype": "json",
+                    data: {
+                        rate: $("#drpRate").val()
+                    }
+
+                },
+
+                "columns": [
+                    { "data": "ItemCode", "title": "ItemCode" },
+                    { "data": "ItemName", "title": "Item Name" },
+                    { "data": "Description", "title": "Description" },
+                    { "data": "Rate", "title": "Rate", "autoWidth": true }
+
+
+                ]
+            });
+        }
+        var rates = $("#drpRate").val();
+
+        $("#idSearch").click(function () {
+            alert("Button click call");
+            var dataTbl = $("#myTable").DataTable();
+            dataTbl.destroy();
+            LoadGrid(rates);
+        })
+    </script>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

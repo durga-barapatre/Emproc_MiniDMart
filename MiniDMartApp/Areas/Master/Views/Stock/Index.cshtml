@@ -1,0 +1,130 @@
+﻿@model MiniDMartApp.Application.Models.StockDataModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<hr />
+
+<div style="width:90%; margin:0 auto;">
+
+    <table id="myTable">
+    </table>
+</div>
+<hr />
+<hr />
+
+<style>
+    tr.even {
+        background-color: #F5F5F5 !important;
+    }
+</style>
+
+
+<link href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+@section Scripts{
+    <script src="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            
+            debugger;
+            LoadGrid();
+           
+        });
+        function AddStock(ItemCode) {
+          
+            var addVal = $("#quanitText_" + ItemCode).val();
+            var reqObj = { Quantity: addVal, ItemCode: ItemCode };
+            alert(reqObj.ItemCode);
+            console.info(reqObj);
+            alert(addVal);
+            $.ajax({
+                url: "/Stock/IncreaseStock",
+                data: reqObj,
+                type: "Post",
+                success: function (response) {
+                    $("#quanitText_" + ItemCode).val(response.Quantity);
+                    console.info(response);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+           
+        }
+        function DecreaseStock(ItemCode) {
+            var decVal = $("#quanitText_" + ItemCode).val();
+            alert(decVal);
+            var reqObj = { Quantity: decVal, ItemCode: ItemCode };
+            alert(reqObj.ItemCode);
+            console.info(reqObj);
+            alert(decVal);
+            $.ajax({
+                url: "/Stock/DecreaseStock",
+                data: reqObj,
+                type: "Post",
+                success: function (response) {
+                    $("#quanitText_" + ItemCode).val(response.Quantity);
+                    console.info(response);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+        function LoadGrid() {
+
+            alert("Call Load Grid");
+            $('#myTable').DataTable({
+
+                "ajax": {
+                    "url": "/Stock/GetAllStock",
+                    "type": "Post",
+                    "datatype": "json",
+                    
+                },
+
+                "columns": [
+                    { "data": "ItemName", "title": "ItemName" },
+                    { "data": "Description", "title": "Description" },
+                    { "data": "ItemCode", "title": "ItemCode" },
+                   { "data": "Quantity", "title": "Quantity", "autoWidth": true },
+        
+                    {
+                        "title": "Increase/Decrease Stock ", "data": "Quantity",
+                        render: function (data, type, row) {
+                            console.info(data);
+                            console.info(row);
+                            return '<input class="form-control trackInput" id="quanitText_'+row.ItemCode+'" name="Quantity" type="text"  value = ' + row.Quantity + '  >';
+
+                        }
+                    },
+                         {
+                        "title": "Increase Stock ", "data": "Quantity",
+                        render: function (data, type, row) {
+                            return '<button class="trackInput btn btn-priamry" id="addBtn" type="button" onclick="AddStock(' + row.ItemCode +')">Increase</button>';
+
+                        }
+                    },
+                    {
+                        "title": "Decrease Stock ", "data": "Quantity",
+                        render: function (data, type, row) {
+                            return '<button class="btn btn-priamry" id="quanitBtn" type="button" onclick="DecreaseStock(' + row.ItemCode +')"> Decrease </button>';
+
+                        }
+                    }
+                ]
+            });
+        }
+       
+    </script>
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
